@@ -1,0 +1,4 @@
+#ifndef LAINE_SCANNER_H
+#define LAINE_SCANNER_H
+
+#endif //LAINE_SCANNER_H
