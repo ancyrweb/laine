@@ -4,6 +4,11 @@
     "*.ejs": "html",
     "*.env.local": "env",
     "common.h": "c",
-    "stdlib.h": "c"
-  }
+    "stdlib.h": "c",
+    "cstdlib": "c",
+    "locale": "c",
+    "ostream": "c",
+    "new": "c"
+  },
+  "C_Cpp.errorSquiggles": "disabled"
 }

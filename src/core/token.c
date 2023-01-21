@@ -3,6 +3,7 @@
 #include "memory.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 
 #define TOKEN_LIST_DEFAULT_SIZE 32
 
@@ -20,7 +21,20 @@ void ln_tokenlist_grow(TokenList *t) {
     t->capacity = next_capacity;
 }
 
+void ln_tokenlist_add(TokenList* list, Token *token) {
+    if (list->size == list->capacity) {
+        ln_tokenlist_grow(list);
+    }
+
+    list->tokens[list->size] = token;
+    list->size++;
+}
+
 void ln_tokenlist_free(TokenList *t) {
+    for (int i = 0; i < t->size; i++) {
+        free(t->tokens[i]);
+    }
+
     free(t->tokens);
     free(t);
 }
