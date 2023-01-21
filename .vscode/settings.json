@@ -3,6 +3,7 @@
   "files.associations": {
     "*.ejs": "html",
     "*.env.local": "env",
-    "common.h": "c"
+    "common.h": "c",
+    "stdlib.h": "c"
   }
 }
