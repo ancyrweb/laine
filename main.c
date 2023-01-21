@@ -3,6 +3,6 @@
 #include "src/compiler.h"
 
 int main() {
-  ln_compile("int a = 0; int b = 1; int c = a + b;");
+  ln_compile("1;");
   return 0;
 }

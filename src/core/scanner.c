@@ -1,5 +1,6 @@
 #include "scanner.h"
 #include "memory.h"
+#include "debug.h"
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -18,6 +19,15 @@ static char advance() {
 
 static char peek() {
   return scanner.source[scanner.current];
+}
+
+static char peek_next() {
+  return scanner.source[scanner.current + 1];
+}
+
+static void scan_err(const char *message) {
+  fprintf(stderr, "%s", message);
+  exit(1);
 }
 
 static void add_token(TokenType type) {
@@ -69,7 +79,7 @@ static bool is_alpha(c) {
 }
 
 static void digits() {
-  while(is_digit(peek())) {
+  while(!is_eof() && is_digit(peek_next())) {
     advance();
   }
 
@@ -77,10 +87,10 @@ static void digits() {
     if (!is_digit(peek())) {
       // a floating point cannot end with a "."
       // TODO error handling
-      exit(1);
+      scan_err("A floating point cannot end with a .");
     }
 
-    while(is_digit(peek())) {
+    while(!is_eof() && is_digit(peek_next())) {
       advance();
     }
 
@@ -90,6 +100,26 @@ static void digits() {
 
   add_token(T_INTEGER_LITERAL);
 }
+
+static void identifier_or_keyword() {
+  while(!is_eof() && is_alpha(peek())) {
+    advance();
+  }
+
+  size_t size = scanner.current - scanner.start;
+  char buff[size + 1];
+  
+  memcpy(&buff, scanner.source + scanner.start, size);
+  buff[size] = '\0';
+
+  if (memcmp(buff, "int", 3) == 0) {
+    add_token(T_INT);
+  } else {
+    add_token(T_IDENTIFIER);
+  }
+  
+}
+
 // Core
 
 void ln_scan_init(const char *source) {
@@ -106,8 +136,8 @@ void ln_scan_start() {
     case symbol: add_token((token)); break
 
   while (!is_eof()) {
-    scanner.start = scanner.current;
     skip_whitespaces();
+    scanner.start = scanner.current;
 
     if (is_eof()) {
       add_token(T_EOF);
@@ -181,6 +211,9 @@ void ln_scan_start() {
       default: {
         if (is_digit(c)) {
           digits();
+          break;
+        } else if (is_alpha(c)) {
+          identifier_or_keyword(c);
           break;
         }
 

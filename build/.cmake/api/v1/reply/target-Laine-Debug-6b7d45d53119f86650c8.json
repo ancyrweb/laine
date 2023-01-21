@@ -35,7 +35,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "-g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk"
+					"fragment" : "-g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk -mmacosx-version-min=13.0"
 				}
 			],
 			"language" : "C",
@@ -54,7 +54,9 @@
 				3,
 				5,
 				7,
-				9
+				9,
+				12,
+				14
 			]
 		}
 	],
@@ -92,7 +94,9 @@
 				3,
 				5,
 				7,
-				9
+				9,
+				12,
+				14
 			]
 		},
 		{
@@ -103,7 +107,9 @@
 				4,
 				6,
 				8,
-				10
+				10,
+				11,
+				13
 			]
 		}
 	],
@@ -169,6 +175,28 @@
 			"backtrace" : 1,
 			"path" : "src/core/memory.h",
 			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "src/core/debug.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "src/core/debug.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "src/core/ast.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "src/core/ast.c",
+			"sourceGroupIndex" : 0
 		}
 	],
 	"type" : "EXECUTABLE"
