@@ -39,6 +39,7 @@ typedef struct Token {
 } Token;
 
 typedef struct TokenList {
+  const char *source;
   unsigned int size;
   unsigned int capacity;
   Token **tokens;

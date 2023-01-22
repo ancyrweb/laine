@@ -4,7 +4,8 @@
 #include "token.h"
 
 typedef enum ASTNodeType {
-  ASTNODE_LITERAL,
+  ASTNODE_VALUE,
+  ASTNODE_BINOP,
 } ASTNodeType;
 
 typedef enum ASTValueType {
@@ -24,10 +25,12 @@ typedef struct {
 } AST_Value;
 
 typedef struct {
-  AST_Node node;
-  AST_Value left;
-  AST_Value right;
+  AST_Node node; // parent
+  AST_Node left; // can be any of sub nodes
+  AST_Node right; // can be any of subnodes too
   Token operand;
 } AST_Binop;
+
+void ln_ast_free(AST_Node *node);
 
 #endif

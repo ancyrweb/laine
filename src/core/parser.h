@@ -18,6 +18,9 @@ typedef struct {
     int capacity;
     AST_Node **nodes;
   } nodes;
+
+  TokenList *tokens;
+  unsigned int current;
 } Parser;
 
 void ln_parser_start(TokenList *tokens);

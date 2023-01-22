@@ -11,7 +11,17 @@
     "new": "c",
     "debug.h": "c",
     "__locale": "c",
-    "__string": "c"
+    "__string": "c",
+    "__bit_reference": "c",
+    "bitset": "c",
+    "chrono": "c",
+    "__memory": "c",
+    "limits": "c",
+    "ratio": "c",
+    "tuple": "c",
+    "type_traits": "c",
+    "vector": "c",
+    "ios": "c"
   },
   "C_Cpp.errorSquiggles": "disabled"
 }

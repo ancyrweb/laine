@@ -4,11 +4,61 @@
 #include <stdlib.h>
 #include <string.h>
 
-void ln_debug_tokens(const char *source, TokenList *list) {
-  #define T(name) case name: printf(#name); printf("\n"); break
+char* ln_debug_toktostr(TokenType type) {
+  #define T(name) case name: { return #name; }
+  switch (type) {
+    T(T_BYTE);
+    T(T_SHORT);
+    T(T_INT);
+    T(T_LONG);
+    T(T_FLOAT);
+    T(T_DOUBLE);
+    T(T_PLUS);
+    T(T_MINUS);
+    T(T_STAR);
+    T(T_SLASH);
+    T(T_MODULO);
+    T(T_PLUS_EQUAL);
+    T(T_MINUS_EQUAL);
+    T(T_STAR_EQUAL);
+    T(T_SLASH_EQUAL);
+    T(T_MODULO_EQUAL);
+    T(T_INCREMENT);
+    T(T_DECREMENT);
+    T(T_GREATER);
+    T(T_GREATER_EQUAL);
+    T(T_LOWER);
+    T(T_LOWER_EQUAL);
+    T(T_EQUAL_EQUAL);
+    T(T_BANG_EQUAL);
+    T(T_BANG);
+    T(T_EQUAL);
+    T(T_PAREN_LEFT);
+    T(T_PAREN_RIGHT);
+    T(T_BRACKET_LEFT);
+    T(T_BRACKET_RIGHT);
+    T(T_BRACE_LEFT);
+    T(T_BRACE_RIGHT);
+    T(T_SEMICOLON);
+    T(T_DOT);
+    T(T_INTEGER_LITERAL)
+    T(T_IDENTIFIER)
+    T(T_STRING_LITERAL)
+    T(T_FLOATING_LITERAL)
+    T(T_EOF);
+    default: {
+      return "T_UNKNOWN";
+    }
+  }
+
+  #undef T
+}
+
+void ln_debug_tokens(TokenList *list) {
+  #define T(name) case name: printf("%s", ln_debug_toktostr(name)); printf("\n"); break
   #define TT(name) \
       case name: { \
-        memcpy(&buff, source + t->start, t->length); \
+        memcpy(&buff, list->source + t->start, t->length); \
         buff[t->length] = '\0'; \
         printf(#name); \
         printf(" (%s)\n", buff); \
@@ -73,10 +123,21 @@ void ln_debug_ast(Parser parser) {
   for (int i = 0; i < parser.nodes.size; i++) {
     AST_Node *node = parser.nodes.nodes[i];
     switch (node->type) {
-      case ASTNODE_LITERAL: {
+      case ASTNODE_VALUE: {
         AST_Value *value = (AST_Value*) node;
         printf("AST Value : %d\n", value->as.int_val);
         break;
+      }
+      case ASTNODE_BINOP: {
+        AST_Binop *value = (AST_Binop*) node;
+        // AST_Value *left = &value->left;
+        // AST_Value *right = &value->right;
+        // printf(
+        //   "AST Binop : %d %s %d", 
+        //   left->as.int_val, 
+        //   ln_debug_toktostr(value->operand.type), 
+        //   right->as.int_val
+        // );
       }
     }
   }

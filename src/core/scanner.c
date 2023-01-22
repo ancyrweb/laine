@@ -79,7 +79,7 @@ static bool is_alpha(c) {
 }
 
 static void digits() {
-  while(!is_eof() && is_digit(peek_next())) {
+  while(!is_eof() && is_digit(peek())) {
     advance();
   }
 
@@ -90,7 +90,7 @@ static void digits() {
       scan_err("A floating point cannot end with a .");
     }
 
-    while(!is_eof() && is_digit(peek_next())) {
+    while(!is_eof() && is_digit(peek())) {
       advance();
     }
 
@@ -126,6 +126,7 @@ void ln_scan_init(const char *source) {
   scanner.source = source;
   scanner.source_length = strlen(source);
   scanner.tokens = ln_tokenlist_init();
+  scanner.tokens->source = source;
   scanner.start = 0;
   scanner.current = 0;
   scanner.line = 0;
@@ -213,16 +214,16 @@ void ln_scan_start() {
           digits();
           break;
         } else if (is_alpha(c)) {
-          identifier_or_keyword(c);
+          identifier_or_keyword();
           break;
         }
 
         printf("Unrecognized token %c\n", c);
       }
     }
-
   }
 
+  ln_debug_tokens(scanner.tokens);
   #undef MATCH
 }
 

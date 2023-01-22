@@ -5,7 +5,8 @@
 #include "ast.h"
 #include "parser.h"
 
-void ln_debug_tokens(const char *source, TokenList *list);
+char* ln_debug_toktostr(TokenType type);
+void ln_debug_tokens(TokenList *list);
 void ln_debug_ast(Parser parser);
 
 #endif
