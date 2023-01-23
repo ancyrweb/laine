@@ -119,26 +119,37 @@ void ln_debug_tokens(TokenList *list) {
   #undef TT
 }
 
+static void debug_node(AST_Node *node, unsigned int depth) {
+  switch (node->type) {
+    case ASTNODE_VALUE: {
+      AST_Value *value = (AST_Value*) node;
+      printf("AST Value : %d\n", value->as.int_val);
+      break;
+    }
+    case ASTNODE_BINOP: {
+      AST_Binop *value = (AST_Binop*) node;
+      AST_Node *left = value->left;
+      AST_Node *right = value->right;
+
+      char buff[1024];
+      sprintf(
+        &buff, 
+        "(%d) | AST Binop\n      Operand : %s\n", 
+        depth, 
+        ln_debug_toktostr(value->operand->type)
+      );
+     
+      printf("%s", buff);
+
+      debug_node(left, depth + 1);
+      debug_node(right, depth + 1);
+    }
+  }
+}
+
 void ln_debug_ast(Parser parser) {
   for (int i = 0; i < parser.nodes.size; i++) {
     AST_Node *node = parser.nodes.nodes[i];
-    switch (node->type) {
-      case ASTNODE_VALUE: {
-        AST_Value *value = (AST_Value*) node;
-        printf("AST Value : %d\n", value->as.int_val);
-        break;
-      }
-      case ASTNODE_BINOP: {
-        AST_Binop *value = (AST_Binop*) node;
-        // AST_Value *left = &value->left;
-        // AST_Value *right = &value->right;
-        // printf(
-        //   "AST Binop : %d %s %d", 
-        //   left->as.int_val, 
-        //   ln_debug_toktostr(value->operand.type), 
-        //   right->as.int_val
-        // );
-      }
-    }
+    debug_node(node, 0);
   }
 }

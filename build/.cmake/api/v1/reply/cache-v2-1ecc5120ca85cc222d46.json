@@ -55,7 +55,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/Users/ancyr/Documents/Dev/Projects/laine/build"
+			"value" : "/Users/anthonybenkhebbab/Documents/Dev/Projects/Laine/build"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -91,7 +91,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "1"
+			"value" : "2"
 		},
 		{
 			"name" : "CMAKE_COMMAND",
@@ -103,7 +103,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/opt/homebrew/Cellar/cmake/3.25.1/bin/cmake"
+			"value" : "/usr/local/Cellar/cmake/3.25.2/bin/cmake"
 		},
 		{
 			"name" : "CMAKE_CPACK_COMMAND",
@@ -115,7 +115,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/opt/homebrew/Cellar/cmake/3.25.1/bin/cpack"
+			"value" : "/usr/local/Cellar/cmake/3.25.2/bin/cpack"
 		},
 		{
 			"name" : "CMAKE_CTEST_COMMAND",
@@ -127,7 +127,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/opt/homebrew/Cellar/cmake/3.25.1/bin/ctest"
+			"value" : "/usr/local/Cellar/cmake/3.25.2/bin/ctest"
 		},
 		{
 			"name" : "CMAKE_CXX_COMPILER",
@@ -151,10 +151,10 @@
 				},
 				{
 					"name" : "HELPSTRING",
-					"value" : "No help, variable specified on the command line."
+					"value" : "C compiler"
 				}
 			],
-			"type" : "FILEPATH",
+			"type" : "STRING",
 			"value" : "/usr/bin/clang"
 		},
 		{
@@ -263,7 +263,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/opt/homebrew/Cellar/cmake/3.25.1/bin/ccmake"
+			"value" : "/usr/local/Cellar/cmake/3.25.1/bin/ccmake"
 		},
 		{
 			"name" : "CMAKE_EXECUTABLE_FORMAT",
@@ -391,7 +391,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/Users/ancyr/Documents/Dev/Projects/laine/build/CMakeFiles/pkgRedirects"
+			"value" : "/Users/anthonybenkhebbab/Documents/Dev/Projects/Laine/build/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -451,7 +451,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/Users/ancyr/Documents/Dev/Projects/laine"
+			"value" : "/Users/anthonybenkhebbab/Documents/Dev/Projects/Laine"
 		},
 		{
 			"name" : "CMAKE_INSTALL_NAME_TOOL",
@@ -511,7 +511,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/opt/homebrew/bin/ninja"
+			"value" : "/usr/local/bin/ninja"
 		},
 		{
 			"name" : "CMAKE_MODULE_LINKER_FLAGS",
@@ -675,7 +675,7 @@
 				}
 			],
 			"type" : "STRING",
-			"value" : "13.0"
+			"value" : ""
 		},
 		{
 			"name" : "CMAKE_OSX_SYSROOT",
@@ -779,7 +779,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/opt/homebrew/Cellar/cmake/3.25.1/share/cmake"
+			"value" : "/usr/local/Cellar/cmake/3.25.2/share/cmake"
 		},
 		{
 			"name" : "CMAKE_SHARED_LINKER_FLAGS",
@@ -1027,7 +1027,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/Users/ancyr/Documents/Dev/Projects/laine/build"
+			"value" : "/Users/anthonybenkhebbab/Documents/Dev/Projects/Laine/build"
 		},
 		{
 			"name" : "Laine_IS_TOP_LEVEL",
@@ -1051,7 +1051,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/Users/ancyr/Documents/Dev/Projects/laine"
+			"value" : "/Users/anthonybenkhebbab/Documents/Dev/Projects/Laine"
 		}
 	],
 	"kind" : "cache",

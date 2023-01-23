@@ -19,6 +19,8 @@ typedef enum TokenType {
     T_BANG,
     T_EQUAL,
 
+    T_AND, T_OR,
+
     T_PAREN_LEFT, T_PAREN_RIGHT,
     T_BRACKET_LEFT, T_BRACKET_RIGHT,
     T_BRACE_LEFT, T_BRACE_RIGHT,

@@ -26,9 +26,9 @@ typedef struct {
 
 typedef struct {
   AST_Node node; // parent
-  AST_Node left; // can be any of sub nodes
-  AST_Node right; // can be any of subnodes too
-  Token operand;
+  AST_Node *left; // can be any of sub nodes
+  AST_Node *right; // can be any of subnodes too
+  Token *operand;
 } AST_Binop;
 
 void ln_ast_free(AST_Node *node);

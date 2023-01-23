@@ -21,7 +21,8 @@
     "tuple": "c",
     "type_traits": "c",
     "vector": "c",
-    "ios": "c"
+    "ios": "c",
+    "__node_handle": "c"
   },
   "C_Cpp.errorSquiggles": "disabled"
 }

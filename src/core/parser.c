@@ -59,7 +59,7 @@ static AST_Node* primary() {
   if (match(T_INTEGER_LITERAL)) {
     Token* t = advance();
 
-    char buff[1024];
+    char buff[t->length + 1];
     memcpy(&buff, parser.tokens->source + t->start, t->length);
     buff[t->length] = '\0'; 
 
@@ -74,9 +74,87 @@ static AST_Node* primary() {
   }
 }
 
+static AST_Binop* alloc_binop(AST_Node *left, AST_Node *right, Token *operand) {
+    AST_Binop *binop = ALLOCATE(AST_Binop, 1);
+    binop->node.type = ASTNODE_BINOP;
+    binop->left = left;
+    binop->right = right;
+    binop->operand = operand;
+    return binop;
+}
+
+static AST_Node* factor_expr() {
+  AST_Node *left = primary();
+  while (match(T_STAR) || match(T_SLASH) || match(T_MODULO)) {
+    Token *operand = advance();
+    AST_Node *right = primary();
+    left = (AST_Node*) alloc_binop(left, right, operand);
+  }
+
+  return left;
+}
+
+static AST_Node* terms_expr() {
+  AST_Node *left = factor_expr();
+  while (match(T_PLUS) || match(T_MINUS)) {
+    Token *operand = advance();
+    AST_Node *right = factor_expr();
+    left = (AST_Node*) alloc_binop(left, right, operand);
+  }
+
+  return left;
+}
+
+static AST_Node* comparison_expr() {
+  AST_Node *left = terms_expr();
+  while (match(T_LOWER) || match(T_LOWER_EQUAL) || match(T_GREATER) || match(T_GREATER_EQUAL)) {
+    Token *operand = advance();
+    AST_Node *right = terms_expr();
+    left = (AST_Node*) alloc_binop(left, right, operand);
+  }
+
+  return left;
+}
+
+static AST_Node* equality_expr() {
+  AST_Node *left = comparison_expr();
+  while (match(T_EQUAL_EQUAL) || match(T_BANG_EQUAL)) {
+    Token *operand = advance();
+    AST_Node *right = comparison_expr();
+    left = (AST_Node*) alloc_binop(left, right, operand);
+  }
+
+  return left;
+}
+
+static AST_Node* and_expr() {
+  AST_Node *left = equality_expr();
+  while (match(T_AND)) {
+    Token *operand = advance();
+    AST_Node *right = equality_expr();
+    left = (AST_Node*) alloc_binop(left, right, operand);
+  }
+
+  return left;
+}
+
+static AST_Node* or_expr() {
+  AST_Node *left = and_expr();
+  while (match(T_OR)) {
+    Token *operand = advance();
+    AST_Node *right = and_expr();
+    left = (AST_Node*) alloc_binop(left, right, operand);
+  }
+
+  return left;
+}
+
+static AST_Node* expr() {
+  return or_expr();
+}
 static AST_Node* expression_statement() {
-  AST_Node *n = primary();
-  consume(T_SEMICOLON, "Expected semi-colon;");
+  AST_Node *n = expr();
+  consume(T_SEMICOLON, "Expected semi-colon");
 
   if (n != NULL) {
     add_node(n);
