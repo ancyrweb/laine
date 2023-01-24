@@ -3,6 +3,6 @@
 #include "src/compiler.h"
 
 int main() {
-  ln_compile("125 + 100 * 50 - 100 / 50 + 25;");
+  ln_compile("-2;");
   return 0;
 }

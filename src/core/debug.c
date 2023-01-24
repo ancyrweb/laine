@@ -123,7 +123,7 @@ static void debug_node(AST_Node *node, unsigned int depth) {
   switch (node->type) {
     case ASTNODE_VALUE: {
       AST_Value *value = (AST_Value*) node;
-      printf("AST Value : %d\n", value->as.int_val);
+      printf("(%d) | Value : %d\n", depth, value->as.int_val);
       break;
     }
     case ASTNODE_BINOP: {
@@ -134,7 +134,7 @@ static void debug_node(AST_Node *node, unsigned int depth) {
       char buff[1024];
       sprintf(
         &buff, 
-        "(%d) | AST Binop\n      Operand : %s\n", 
+        "(%d) | Binop\n      Operand : %s\n", 
         depth, 
         ln_debug_toktostr(value->operand->type)
       );
@@ -143,6 +143,43 @@ static void debug_node(AST_Node *node, unsigned int depth) {
 
       debug_node(left, depth + 1);
       debug_node(right, depth + 1);
+      break;
+    }
+    case ASTNODE_POSTFIX: {
+      AST_PostfixOp *value = (AST_PostfixOp*) node;
+
+      printf(
+        "(%d) | PostfixOp\n     Operand : %s",
+        depth,
+        ln_debug_toktostr(value->operand->type)
+      );
+
+      debug_node(value->left, depth + 1);
+      break;
+    }
+    case ASTNODE_PREFIX: {
+      AST_PrefixOp *value = (AST_PrefixOp*) node;
+
+      
+      printf(
+        "(%d) | PrefixOp\n     Operand : %s",
+        depth,
+        ln_debug_toktostr(value->operand->type)
+      );
+
+      debug_node(value->right, depth + 1);
+      break;
+    }
+    case ASTNODE_GROUPING: {
+      AST_Grouping *value = (AST_Grouping*) node;
+
+      printf(
+        "(%d) | Grouping\n",
+        depth
+      );
+
+      debug_node(value->expr, depth + 1);
+      break;
     }
   }
 }

@@ -16,6 +16,16 @@ void ln_ast_free(AST_Node *node) {
       free(v);
       break;
     }
+    case ASTNODE_POSTFIX: {
+      AST_PostfixOp *v = (AST_PostfixOp*) node;
+      ln_ast_free(v->left);
+      free(v);
+    }
+    case ASTNODE_PREFIX: {
+      AST_PrefixOp *v = (AST_PrefixOp*) node;
+      ln_ast_free(v->right);
+      free(v);
+    }
     default: {
       break;
     }

@@ -6,6 +6,9 @@
 typedef enum ASTNodeType {
   ASTNODE_VALUE,
   ASTNODE_BINOP,
+  ASTNODE_PREFIX,
+  ASTNODE_POSTFIX,
+  ASTNODE_GROUPING
 } ASTNodeType;
 
 typedef enum ASTValueType {
@@ -30,6 +33,24 @@ typedef struct {
   AST_Node *right; // can be any of subnodes too
   Token *operand;
 } AST_Binop;
+
+typedef struct {
+  AST_Node node;
+  AST_Node *expr;
+} AST_Grouping;
+
+typedef struct {
+  AST_Node node; // parent
+  AST_Node *right; // can be any of subnodes too
+  Token *operand;
+} AST_PrefixOp;
+
+typedef struct {
+  AST_Node node; // parent
+  AST_Node *left; // can be any of subnodes too
+  Token *operand;
+} AST_PostfixOp;
+
 
 void ln_ast_free(AST_Node *node);
 

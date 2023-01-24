@@ -31,7 +31,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar"
+			"value" : "/usr/bin/ar"
 		},
 		{
 			"name" : "CMAKE_BUILD_TYPE",
@@ -39,7 +39,7 @@
 			[
 				{
 					"name" : "HELPSTRING",
-					"value" : "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel ..."
+					"value" : "No help, variable specified on the command line."
 				}
 			],
 			"type" : "STRING",
@@ -55,7 +55,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/Users/anthonybenkhebbab/Documents/Dev/Projects/Laine/cmake-build-debug"
+			"value" : "/Users/ancyr/Documents/Dev/Projects/laine/build"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -79,7 +79,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "24"
+			"value" : "25"
 		},
 		{
 			"name" : "CMAKE_CACHE_PATCH_VERSION",
@@ -94,18 +94,6 @@
 			"value" : "2"
 		},
 		{
-			"name" : "CMAKE_COLOR_DIAGNOSTICS",
-			"properties" : 
-			[
-				{
-					"name" : "HELPSTRING",
-					"value" : "Enable colored diagnostics throughout."
-				}
-			],
-			"type" : "BOOL",
-			"value" : "ON"
-		},
-		{
 			"name" : "CMAKE_COMMAND",
 			"properties" : 
 			[
@@ -115,7 +103,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake"
+			"value" : "/opt/homebrew/Cellar/cmake/3.25.2/bin/cmake"
 		},
 		{
 			"name" : "CMAKE_CPACK_COMMAND",
@@ -127,7 +115,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/Applications/CLion.app/Contents/bin/cmake/mac/bin/cpack"
+			"value" : "/opt/homebrew/Cellar/cmake/3.25.2/bin/cpack"
 		},
 		{
 			"name" : "CMAKE_CTEST_COMMAND",
@@ -139,7 +127,19 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/Applications/CLion.app/Contents/bin/cmake/mac/bin/ctest"
+			"value" : "/opt/homebrew/Cellar/cmake/3.25.2/bin/ctest"
+		},
+		{
+			"name" : "CMAKE_CXX_COMPILER",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "No help, variable specified on the command line."
+				}
+			],
+			"type" : "FILEPATH",
+			"value" : "/usr/bin/clang++"
 		},
 		{
 			"name" : "CMAKE_C_COMPILER",
@@ -154,8 +154,8 @@
 					"value" : "C compiler"
 				}
 			],
-			"type" : "FILEPATH",
-			"value" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc"
+			"type" : "STRING",
+			"value" : "/usr/bin/clang"
 		},
 		{
 			"name" : "CMAKE_C_FLAGS",
@@ -254,6 +254,18 @@
 			"value" : "CMAKE_DLLTOOL-NOTFOUND"
 		},
 		{
+			"name" : "CMAKE_EDIT_COMMAND",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Path to cache edit program executable."
+				}
+			],
+			"type" : "INTERNAL",
+			"value" : "/opt/homebrew/Cellar/cmake/3.25.1/bin/ccmake"
+		},
+		{
 			"name" : "CMAKE_EXECUTABLE_FORMAT",
 			"properties" : 
 			[
@@ -350,16 +362,12 @@
 			"properties" : 
 			[
 				{
-					"name" : "ADVANCED",
-					"value" : "1"
-				},
-				{
 					"name" : "HELPSTRING",
-					"value" : "Enable/Disable output of compile commands during generation."
+					"value" : "No help, variable specified on the command line."
 				}
 			],
 			"type" : "BOOL",
-			"value" : ""
+			"value" : "TRUE"
 		},
 		{
 			"name" : "CMAKE_EXTRA_GENERATOR",
@@ -383,7 +391,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/Users/anthonybenkhebbab/Documents/Dev/Projects/Laine/cmake-build-debug/CMakeFiles/pkgRedirects"
+			"value" : "/Users/ancyr/Documents/Dev/Projects/laine/build/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -443,7 +451,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/Users/anthonybenkhebbab/Documents/Dev/Projects/Laine"
+			"value" : "/Users/ancyr/Documents/Dev/Projects/laine"
 		},
 		{
 			"name" : "CMAKE_INSTALL_NAME_TOOL",
@@ -487,19 +495,23 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld"
+			"value" : "/usr/bin/ld"
 		},
 		{
 			"name" : "CMAKE_MAKE_PROGRAM",
 			"properties" : 
 			[
 				{
+					"name" : "ADVANCED",
+					"value" : "1"
+				},
+				{
 					"name" : "HELPSTRING",
-					"value" : "No help, variable specified on the command line."
+					"value" : "Program used to build from build.ninja files."
 				}
 			],
-			"type" : "UNINITIALIZED",
-			"value" : "/Applications/CLion.app/Contents/bin/ninja/mac/ninja"
+			"type" : "FILEPATH",
+			"value" : "/opt/homebrew/bin/ninja"
 		},
 		{
 			"name" : "CMAKE_MODULE_LINKER_FLAGS",
@@ -595,7 +607,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/nm"
+			"value" : "/usr/bin/nm"
 		},
 		{
 			"name" : "CMAKE_NUMBER_OF_MAKEFILES",
@@ -639,7 +651,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/objdump"
+			"value" : "/usr/bin/objdump"
 		},
 		{
 			"name" : "CMAKE_OSX_ARCHITECTURES",
@@ -663,7 +675,7 @@
 				}
 			],
 			"type" : "STRING",
-			"value" : ""
+			"value" : "13.0"
 		},
 		{
 			"name" : "CMAKE_OSX_SYSROOT",
@@ -739,7 +751,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib"
+			"value" : "/usr/bin/ranlib"
 		},
 		{
 			"name" : "CMAKE_READELF",
@@ -767,7 +779,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.24"
+			"value" : "/opt/homebrew/Cellar/cmake/3.25.2/share/cmake"
 		},
 		{
 			"name" : "CMAKE_SHARED_LINKER_FLAGS",
@@ -975,7 +987,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip"
+			"value" : "/usr/bin/strip"
 		},
 		{
 			"name" : "CMAKE_UNAME",
@@ -1015,7 +1027,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/Users/anthonybenkhebbab/Documents/Dev/Projects/Laine/cmake-build-debug"
+			"value" : "/Users/ancyr/Documents/Dev/Projects/laine/build"
 		},
 		{
 			"name" : "Laine_IS_TOP_LEVEL",
@@ -1039,7 +1051,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/Users/anthonybenkhebbab/Documents/Dev/Projects/Laine"
+			"value" : "/Users/ancyr/Documents/Dev/Projects/laine"
 		}
 	],
 	"kind" : "cache",

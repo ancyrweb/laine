@@ -12,6 +12,9 @@
 
 Parser parser;
 
+// headers
+static AST_Node* expr();
+
 // allocation
 static void add_node(AST_Node *node) {
   if (parser.nodes.size == parser.nodes.capacity) {
@@ -55,25 +58,6 @@ static Token* advance() {
   return parser.tokens->tokens[parser.current++];
 }
 
-static AST_Node* primary() {
-  if (match(T_INTEGER_LITERAL)) {
-    Token* t = advance();
-
-    char buff[t->length + 1];
-    memcpy(&buff, parser.tokens->source + t->start, t->length);
-    buff[t->length] = '\0'; 
-
-    AST_Value *v = ALLOCATE(AST_Value, 1);
-    v->as.int_val = atoi(buff);
-    v->node.type = ASTNODE_VALUE;
-    v->type = ASTVAL_INT;
-    
-    return (AST_Node*) v;
-  } else {
-    syntax_error("Expected primary.");
-  }
-}
-
 static AST_Binop* alloc_binop(AST_Node *left, AST_Node *right, Token *operand) {
     AST_Binop *binop = ALLOCATE(AST_Binop, 1);
     binop->node.type = ASTNODE_BINOP;
@@ -83,11 +67,97 @@ static AST_Binop* alloc_binop(AST_Node *left, AST_Node *right, Token *operand) {
     return binop;
 }
 
-static AST_Node* factor_expr() {
-  AST_Node *left = primary();
-  while (match(T_STAR) || match(T_SLASH) || match(T_MODULO)) {
+static AST_Node* primary() {
+  if (match(T_INTEGER_LITERAL) || match(T_IDENTIFIER) || match(T_FLOATING_LITERAL) || match(T_STRING_LITERAL)) {
+    Token* t = advance();
+
+    char buff[t->length + 1];
+    memcpy(&buff, parser.tokens->source + t->start, t->length);
+    buff[t->length] = '\0'; 
+
+    
+    AST_Value *v = ALLOCATE(AST_Value, 1);
+    v->node.type = ASTNODE_VALUE;
+
+    AST_Node *output = (AST_Node*) v;
+
+    switch (t->type) {
+      case T_INTEGER_LITERAL: {
+        v->as.int_val = atoi(buff);
+        v->type = ASTVAL_INT;
+        break;
+      }
+      case T_FLOATING_LITERAL: {
+        v->as.int_val = atoi(buff);
+        v->type = ASTVAL_INT;
+        break;
+      }
+      case T_STRING_LITERAL: {
+        v->as.int_val = atoi(buff);
+        v->type = ASTVAL_INT;
+      }
+      case T_IDENTIFIER: {
+        v->as.int_val = atoi(buff);
+        v->type = ASTVAL_INT;
+
+        if (match(T_INCREMENT) || match(T_DECREMENT)) {
+          Token *postfix = advance();
+          AST_PostfixOp *postfix_node = ALLOCATE(AST_PostfixOp, 1);
+          postfix_node->node.type = ASTNODE_POSTFIX;
+          postfix_node->left = v;
+          postfix_node->operand = postfix;
+
+          output = (AST_Node*) postfix;
+        }
+      }
+      default: {
+        syntax_error('Expected type.');
+        break;
+      }
+    }
+       
+    return output;
+  } else {
+    syntax_error("Expected primary.");
+  }
+}
+
+static AST_Node* prefixUnary() {
+  if (match(T_MINUS) || match(T_INCREMENT) || match(T_DECREMENT) || match(T_BANG)) {
     Token *operand = advance();
     AST_Node *right = primary();
+    
+
+    AST_PrefixOp *v = ALLOCATE(AST_PrefixOp, 1);
+    v->node.type = ASTNODE_PREFIX;
+    v->operand = operand;
+    v->right = right;
+    return v;
+  }
+
+  return primary();
+}
+
+static AST_Node* grouping() {
+  if (match(T_PAREN_LEFT)) {
+    advance();
+    AST_Node *e = expr();
+    consume(T_PAREN_RIGHT, "Expected right parenthesis.");
+
+    AST_Grouping *v = ALLOCATE(AST_Grouping, 1);
+    v->node.type = ASTNODE_GROUPING;
+    v->expr = e;
+    return v;
+  }
+
+  return prefixUnary();
+}
+
+static AST_Node* factor_expr() {
+  AST_Node *left = grouping();
+  while (match(T_STAR) || match(T_SLASH) || match(T_MODULO)) {
+    Token *operand = advance();
+    AST_Node *right = grouping();
     left = (AST_Node*) alloc_binop(left, right, operand);
   }
 

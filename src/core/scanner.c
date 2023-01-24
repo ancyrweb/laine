@@ -209,6 +209,22 @@ void ln_scan_start() {
         }
         break;
       }
+      case '>': {
+        if (match('=')) {
+          add_token(T_GREATER_EQUAL);
+        } else {
+          add_token(T_GREATER);
+        }
+        break;
+      }
+      case '<': {
+        if (match('=')) {
+          add_token(T_LOWER_EQUAL);
+        } else {
+          add_token(T_LOWER);
+        }
+        break;
+      }
       default: {
         if (is_digit(c)) {
           digits();
