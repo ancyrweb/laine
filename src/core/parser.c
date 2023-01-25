@@ -13,14 +13,14 @@
 Parser parser;
 
 // headers
-static AST_Node* expr();
+static ASTExprNode* expr();
 
 // allocation
-static void add_node(AST_Node *node) {
+static void add_node(ASTExprNode *node) {
   if (parser.nodes.size == parser.nodes.capacity) {
     if (parser.nodes.size == 0) {
       parser.nodes.capacity = 8;
-      parser.nodes.nodes = ALLOCATE(AST_Node, parser.nodes.capacity);
+      parser.nodes.nodes = ALLOCATE(ASTExprNode, parser.nodes.capacity);
     } else {
       int next_capacity = parser.nodes.capacity * 2;
       parser.nodes.nodes = ln_reallocate(parser.nodes.nodes, parser.nodes.capacity, next_capacity);
@@ -58,9 +58,9 @@ static Token* advance() {
   return parser.tokens->tokens[parser.current++];
 }
 
-static AST_Binop* alloc_binop(AST_Node *left, AST_Node *right, Token *operand) {
-    AST_Binop *binop = ALLOCATE(AST_Binop, 1);
-    binop->node.type = ASTNODE_BINOP;
+static ASTExprBinop* alloc_binop(ASTExprNode *left, ASTExprNode *right, Token *operand) {
+    ASTExprBinop *binop = ALLOCATE(ASTExprBinop, 1);
+    binop->node.type = AST_EXPR_BINOP;
     binop->left = left;
     binop->right = right;
     binop->operand = operand;
@@ -90,14 +90,14 @@ static char* extract_lexeme(Token* t) {
 }
 
 // parsing
-static AST_Node* primary() {
+static ASTExprNode* primary() {
   if (match(T_INTEGER_LITERAL) || match(T_IDENTIFIER) || match(T_FLOATING_LITERAL) || match(T_STRING_LITERAL)) {
     Token* t = advance();
 
-    AST_Value *v = ALLOCATE(AST_Value, 1);
-    v->node.type = ASTNODE_VALUE;
+    ASTExprValue *v = ALLOCATE(ASTExprValue, 1);
+    v->node.type = AST_EXPR_VALUE;
 
-    AST_Node *output = (AST_Node*) v;
+    ASTExprNode *output = (ASTExprNode*) v;
 
     switch (t->type) {
       case T_INTEGER_LITERAL: {
@@ -106,7 +106,7 @@ static AST_Node* primary() {
         buff[t->length] = '\0'; 
 
         v->as.int_val = atoi(buff);
-        v->type = ASTVAL_INT;
+        v->type = AST_EXPRVAL_INT;
         break;
       }
       case T_FLOATING_LITERAL: {
@@ -115,26 +115,26 @@ static AST_Node* primary() {
         buff[t->length] = '\0'; 
 
         v->as.float_val = atof(buff);
-        v->type = ASTVAL_FLOAT;
+        v->type = AST_EXPRVAL_FLOAT;
         break;
       }
       case T_STRING_LITERAL: {
         v->as.string_val = extract_string_literal(t);
-        v->type = ASTVAL_STRING;
+        v->type = AST_EXPRVAL_STRING;
         break;
       }
       case T_IDENTIFIER: {
         v->as.string_val = extract_lexeme(t);
-        v->type = ASTVAL_IDENTIFIER;
+        v->type = AST_EXPRVAL_IDENTIFIER;
 
         if (match(T_INCREMENT) || match(T_DECREMENT)) {
           Token *postfix = advance();
-          AST_PostfixOp *postfix_node = ALLOCATE(AST_PostfixOp, 1);
-          postfix_node->node.type = ASTNODE_POSTFIX;
-          postfix_node->left = (AST_Node*) v;
+          ASTExprPostfixOp *postfix_node = ALLOCATE(ASTExprPostfixOp, 1);
+          postfix_node->node.type = AST_EXPR_POSTFIX;
+          postfix_node->left = (ASTExprNode*) v;
           postfix_node->operand = postfix;
 
-          output = (AST_Node*) postfix;
+          output = (ASTExprNode*) postfix;
         }
 
         break;
@@ -151,109 +151,109 @@ static AST_Node* primary() {
   }
 }
 
-static AST_Node* prefixUnary() {
+static ASTExprNode* prefixUnary() {
   if (match(T_MINUS) || match(T_INCREMENT) || match(T_DECREMENT) || match(T_BANG)) {
     Token *operand = advance();
-    AST_Node *right = primary();
+    ASTExprNode *right = primary();
     
 
-    AST_PrefixOp *v = ALLOCATE(AST_PrefixOp, 1);
-    v->node.type = ASTNODE_PREFIX;
+    ASTExprPrefixOp *v = ALLOCATE(ASTExprPrefixOp, 1);
+    v->node.type = AST_EXPR_PREFIX;
     v->operand = operand;
     v->right = right;
-    return (AST_Node*) v;
+    return (ASTExprNode*) v;
   }
 
   return primary();
 }
 
-static AST_Node* grouping() {
+static ASTExprNode* grouping() {
   if (match(T_PAREN_LEFT)) {
     advance();
-    AST_Node *e = expr();
+    ASTExprNode *e = expr();
     consume(T_PAREN_RIGHT, "Expected right parenthesis.");
 
-    AST_Grouping *v = ALLOCATE(AST_Grouping, 1);
-    v->node.type = ASTNODE_GROUPING;
+    ASTExprGroup *v = ALLOCATE(ASTExprGroup, 1);
+    v->node.type = AST_EXPR_GROUPING;
     v->expr = e;
-    return (AST_Node*) v;
+    return (ASTExprNode*) v;
   }
 
   return prefixUnary();
 }
 
-static AST_Node* factor_expr() {
-  AST_Node *left = grouping();
+static ASTExprNode* factor_expr() {
+  ASTExprNode *left = grouping();
   while (match(T_STAR) || match(T_SLASH) || match(T_MODULO)) {
     Token *operand = advance();
-    AST_Node *right = grouping();
-    left = (AST_Node*) alloc_binop(left, right, operand);
+    ASTExprNode *right = grouping();
+    left = (ASTExprNode*) alloc_binop(left, right, operand);
   }
 
   return left;
 }
 
-static AST_Node* terms_expr() {
-  AST_Node *left = factor_expr();
+static ASTExprNode* terms_expr() {
+  ASTExprNode *left = factor_expr();
   while (match(T_PLUS) || match(T_MINUS)) {
     Token *operand = advance();
-    AST_Node *right = factor_expr();
-    left = (AST_Node*) alloc_binop(left, right, operand);
+    ASTExprNode *right = factor_expr();
+    left = (ASTExprNode*) alloc_binop(left, right, operand);
   }
 
   return left;
 }
 
-static AST_Node* comparison_expr() {
-  AST_Node *left = terms_expr();
+static ASTExprNode* comparison_expr() {
+  ASTExprNode *left = terms_expr();
   while (match(T_LOWER) || match(T_LOWER_EQUAL) || match(T_GREATER) || match(T_GREATER_EQUAL)) {
     Token *operand = advance();
-    AST_Node *right = terms_expr();
-    left = (AST_Node*) alloc_binop(left, right, operand);
+    ASTExprNode *right = terms_expr();
+    left = (ASTExprNode*) alloc_binop(left, right, operand);
   }
 
   return left;
 }
 
-static AST_Node* equality_expr() {
-  AST_Node *left = comparison_expr();
+static ASTExprNode* equality_expr() {
+  ASTExprNode *left = comparison_expr();
   while (match(T_EQUAL_EQUAL) || match(T_BANG_EQUAL)) {
     Token *operand = advance();
-    AST_Node *right = comparison_expr();
-    left = (AST_Node*) alloc_binop(left, right, operand);
+    ASTExprNode *right = comparison_expr();
+    left = (ASTExprNode*) alloc_binop(left, right, operand);
   }
 
   return left;
 }
 
-static AST_Node* and_expr() {
-  AST_Node *left = equality_expr();
+static ASTExprNode* and_expr() {
+  ASTExprNode *left = equality_expr();
   while (match(T_AND)) {
     Token *operand = advance();
-    AST_Node *right = equality_expr();
-    left = (AST_Node*) alloc_binop(left, right, operand);
+    ASTExprNode *right = equality_expr();
+    left = (ASTExprNode*) alloc_binop(left, right, operand);
   }
 
   return left;
 }
 
-static AST_Node* or_expr() {
-  AST_Node *left = and_expr();
+static ASTExprNode* or_expr() {
+  ASTExprNode *left = and_expr();
   while (match(T_OR)) {
     Token *operand = advance();
-    AST_Node *right = and_expr();
-    left = (AST_Node*) alloc_binop(left, right, operand);
+    ASTExprNode *right = and_expr();
+    left = (ASTExprNode*) alloc_binop(left, right, operand);
   }
 
   return left;
 }
 
-static AST_Node* expr() {
+static ASTExprNode* expr() {
   return or_expr();
 }
 
-static AST_Node* expression_statement() {
-  AST_Node *n = expr();
+static ASTExprNode* expression_statement() {
+  ASTExprNode *n = expr();
   consume(T_SEMICOLON, "Expected semi-colon");
 
   if (n != NULL) {

@@ -9,14 +9,14 @@
 typedef struct {
   int size;
   int capacity;
-  AST_Node **nodes;
+  ASTExprNode **nodes;
 } ParserNodes;
 
 typedef struct {
   struct {
     int size;
     int capacity;
-    AST_Node **nodes;
+    ASTExprNode **nodes;
   } nodes;
 
   TokenList *tokens;

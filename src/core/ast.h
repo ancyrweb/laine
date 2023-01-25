@@ -3,60 +3,68 @@
 
 #include "token.h"
 
-typedef enum ASTNodeType {
-  ASTNODE_VALUE,
-  ASTNODE_BINOP,
-  ASTNODE_PREFIX,
-  ASTNODE_POSTFIX,
-  ASTNODE_GROUPING
-} ASTNodeType;
+typedef enum ASTStatementType {
+  AST_STMT_EXPR
+} ASTStatementType;
 
-typedef enum ASTValueType {
-  ASTVAL_INT,
-  ASTVAL_FLOAT,
-  ASTVAL_STRING,
-  ASTVAL_IDENTIFIER,
-} ASTValueType;
+typedef struct ASTStatementNode {
+  ASTStatementType type;
+} ASTStatementNode;
+
+typedef enum ASTExprType {
+  AST_EXPR_VALUE,
+  AST_EXPR_BINOP,
+  AST_EXPR_PREFIX,
+  AST_EXPR_POSTFIX,
+  AST_EXPR_GROUPING
+} ASTExprType;
+
+typedef enum ASTExprValueType {
+  AST_EXPRVAL_INT,
+  AST_EXPRVAL_FLOAT,
+  AST_EXPRVAL_STRING,
+  AST_EXPRVAL_IDENTIFIER,
+} ASTExprValueType;
 
 typedef struct {
-  ASTNodeType type;
-} AST_Node;
+  ASTExprType type;
+} ASTExprNode;
 
 typedef struct {
-  AST_Node node;
-  ASTValueType type;
+  ASTExprNode node;
+  ASTExprValueType type;
   union {
     int int_val; 
     double float_val;
     char *string_val;
   } as;
-} AST_Value;
+} ASTExprValue;
 
 typedef struct {
-  AST_Node node; // parent
-  AST_Node *left; // can be any of sub nodes
-  AST_Node *right; // can be any of subnodes too
+  ASTExprNode node; // parent
+  ASTExprNode *left; // can be any of sub nodes
+  ASTExprNode *right; // can be any of subnodes too
   Token *operand;
-} AST_Binop;
+} ASTExprBinop;
 
 typedef struct {
-  AST_Node node;
-  AST_Node *expr;
-} AST_Grouping;
+  ASTExprNode node;
+  ASTExprNode *expr;
+} ASTExprGroup;
 
 typedef struct {
-  AST_Node node; // parent
-  AST_Node *right; // can be any of subnodes too
+  ASTExprNode node; // parent
+  ASTExprNode *right; // can be any of subnodes too
   Token *operand;
-} AST_PrefixOp;
+} ASTExprPrefixOp;
 
 typedef struct {
-  AST_Node node; // parent
-  AST_Node *left; // can be any of subnodes too
+  ASTExprNode node; // parent
+  ASTExprNode *left; // can be any of subnodes too
   Token *operand;
-} AST_PostfixOp;
+} ASTExprPostfixOp;
 
 
-void ln_ast_free(AST_Node *node);
+void ln_ast_free(ASTExprNode *node);
 
 #endif
