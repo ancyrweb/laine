@@ -6,10 +6,10 @@ void ln_ast_free(AST_Node *node) {
   switch (node->type) {
     case ASTNODE_VALUE: {
       AST_Value *v = (AST_Value*) node;
-      if (v->type == ASTVAL_STRING) {
+      if (v->type == ASTVAL_STRING || v->type == ASTVAL_IDENTIFIER) {
         free(v->as.string_val);
       }
-      
+
       free(v);
       break;
     }
