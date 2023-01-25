@@ -159,7 +159,6 @@ static void debug_node(AST_Node *node, unsigned int depth) {
     }
     case ASTNODE_PREFIX: {
       AST_PrefixOp *value = (AST_PrefixOp*) node;
-
       
       printf(
         "(%d) | PrefixOp\n     Operand : %s",
