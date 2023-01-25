@@ -36,6 +36,7 @@ static void add_token(TokenType type) {
   t->length = scanner.current - scanner.start;
   t->line = scanner.line;
   t->type = type;
+
   ln_tokenlist_add(scanner.tokens, t);
 }
 
@@ -120,6 +121,18 @@ static void identifier_or_keyword() {
   
 }
 
+static void string_literal() {
+  char c = advance();
+  while (!is_eof() && c != '"') {
+    c = advance();
+  }
+
+  if (is_eof()) {
+    scan_err("Unterminated literal string.");
+  }
+
+  add_token(T_STRING_LITERAL);
+}
 // Core
 
 void ln_scan_init(const char *source) {
@@ -223,6 +236,10 @@ void ln_scan_start() {
         } else {
           add_token(T_LOWER);
         }
+        break;
+      }
+      case '"': {
+        string_literal();
         break;
       }
       default: {

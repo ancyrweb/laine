@@ -13,6 +13,9 @@ typedef enum ASTNodeType {
 
 typedef enum ASTValueType {
   ASTVAL_INT,
+  ASTVAL_FLOAT,
+  ASTVAL_STRING,
+  ASTVAL_IDENTIFIER,
 } ASTValueType;
 
 typedef struct {
@@ -24,6 +27,8 @@ typedef struct {
   ASTValueType type;
   union {
     int int_val; 
+    double float_val;
+    char *string_val;
   } as;
 } AST_Value;
 

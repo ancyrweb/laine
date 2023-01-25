@@ -120,10 +120,32 @@ void ln_debug_tokens(TokenList *list) {
 }
 
 static void debug_node(AST_Node *node, unsigned int depth) {
+  #define PRINT_BUFF() \
+    p += sprintf(p, "%c", '\0'); \
+    printf("%s\n", printf_buffer); \
+    free(printf_buffer);
+
+  char *printf_buffer = malloc(sizeof(char) * 1024);
+  char *p = printf_buffer;
+
+  for (int i = 0; i < depth; i++) {
+    p += sprintf(p, "--");
+  }
+  
   switch (node->type) {
     case ASTNODE_VALUE: {
       AST_Value *value = (AST_Value*) node;
-      printf("(%d) | Value : %d\n", depth, value->as.int_val);
+      if (value->type == ASTVAL_INT) {
+        p += sprintf(p, "- Integer : %d", value->as.int_val);
+      } else if (value->type == ASTVAL_FLOAT) {
+        p += sprintf(p, "- Float : %lf", value->as.float_val);
+      } else if (value->type == ASTVAL_STRING) {
+        p += sprintf(p, "- String : %s", value->as.string_val);
+      } else if (value->type == ASTVAL_IDENTIFIER) {
+        p += sprintf(p, "- Identifier : %s", value->as.string_val);
+      }
+
+      PRINT_BUFF();
       break;
     }
     case ASTNODE_BINOP: {
@@ -131,15 +153,8 @@ static void debug_node(AST_Node *node, unsigned int depth) {
       AST_Node *left = value->left;
       AST_Node *right = value->right;
 
-      char buff[1024];
-      sprintf(
-        &buff, 
-        "(%d) | Binop\n      Operand : %s\n", 
-        depth, 
-        ln_debug_toktostr(value->operand->type)
-      );
-     
-      printf("%s", buff);
+      p += sprintf(p, "- Binop - Operand : %s", ln_debug_toktostr(value->operand->type));
+      PRINT_BUFF();
 
       debug_node(left, depth + 1);
       debug_node(right, depth + 1);
@@ -148,11 +163,8 @@ static void debug_node(AST_Node *node, unsigned int depth) {
     case ASTNODE_POSTFIX: {
       AST_PostfixOp *value = (AST_PostfixOp*) node;
 
-      printf(
-        "(%d) | PostfixOp\n     Operand : %s",
-        depth,
-        ln_debug_toktostr(value->operand->type)
-      );
+      p += sprintf(p, "- PostfixOp - Operand : %s", ln_debug_toktostr(value->operand->type));
+      PRINT_BUFF();
 
       debug_node(value->left, depth + 1);
       break;
@@ -160,11 +172,8 @@ static void debug_node(AST_Node *node, unsigned int depth) {
     case ASTNODE_PREFIX: {
       AST_PrefixOp *value = (AST_PrefixOp*) node;
       
-      printf(
-        "(%d) | PrefixOp\n     Operand : %s",
-        depth,
-        ln_debug_toktostr(value->operand->type)
-      );
+      p += sprintf(p, "- PrefixOp - Operand : %s", ln_debug_toktostr(value->operand->type));
+      PRINT_BUFF();
 
       debug_node(value->right, depth + 1);
       break;
@@ -172,18 +181,19 @@ static void debug_node(AST_Node *node, unsigned int depth) {
     case ASTNODE_GROUPING: {
       AST_Grouping *value = (AST_Grouping*) node;
 
-      printf(
-        "(%d) | Grouping\n",
-        depth
-      );
-
+      p += sprintf(p, "- Grouping");
+      PRINT_BUFF();
+   
       debug_node(value->expr, depth + 1);
       break;
     }
   }
+
+  #undef PRINT_BUFF
 }
 
 void ln_debug_ast(Parser parser) {
+  printf("--- AST ---\n");
   for (int i = 0; i < parser.nodes.size; i++) {
     AST_Node *node = parser.nodes.nodes[i];
     debug_node(node, 0);

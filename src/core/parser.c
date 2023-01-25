@@ -67,15 +67,33 @@ static AST_Binop* alloc_binop(AST_Node *left, AST_Node *right, Token *operand) {
     return binop;
 }
 
+static char* extract_string_literal(Token* t) {
+  int size = t->length - 2; // take the " out
+  char *buff = malloc(sizeof(char) * size + 1); // leave space for \0
+  const char *p = parser.tokens->source + t->start + 1;
+
+  strncpy(buff, p, size);
+  buff[size] = '\0';
+
+  return buff;
+}
+
+static char* extract_lexeme(Token* t) {
+  int size = t->length; // take the " out
+  char *buff = malloc(sizeof(char) * size + 1); // leave space for \0
+  const char *p = parser.tokens->source + t->start;
+
+  strncpy(buff, p, size);
+  buff[size] = '\0';
+
+  return buff;
+}
+
+// parsing
 static AST_Node* primary() {
   if (match(T_INTEGER_LITERAL) || match(T_IDENTIFIER) || match(T_FLOATING_LITERAL) || match(T_STRING_LITERAL)) {
     Token* t = advance();
 
-    char buff[t->length + 1];
-    memcpy(&buff, parser.tokens->source + t->start, t->length);
-    buff[t->length] = '\0'; 
-
-    
     AST_Value *v = ALLOCATE(AST_Value, 1);
     v->node.type = ASTNODE_VALUE;
 
@@ -83,35 +101,46 @@ static AST_Node* primary() {
 
     switch (t->type) {
       case T_INTEGER_LITERAL: {
+        char buff[t->length + 1];
+        memcpy(&buff, parser.tokens->source + t->start, t->length);
+        buff[t->length] = '\0'; 
+
         v->as.int_val = atoi(buff);
         v->type = ASTVAL_INT;
         break;
       }
       case T_FLOATING_LITERAL: {
-        v->as.int_val = atoi(buff);
-        v->type = ASTVAL_INT;
+        char buff[t->length + 1];
+        memcpy(&buff, parser.tokens->source + t->start, t->length);
+        buff[t->length] = '\0'; 
+
+        v->as.float_val = atof(buff);
+        v->type = ASTVAL_FLOAT;
         break;
       }
       case T_STRING_LITERAL: {
-        v->as.int_val = atoi(buff);
-        v->type = ASTVAL_INT;
+        v->as.string_val = extract_string_literal(t);
+        v->type = ASTVAL_STRING;
+        break;
       }
       case T_IDENTIFIER: {
-        v->as.int_val = atoi(buff);
-        v->type = ASTVAL_INT;
+        v->as.string_val = extract_lexeme(t);
+        v->type = ASTVAL_IDENTIFIER;
 
         if (match(T_INCREMENT) || match(T_DECREMENT)) {
           Token *postfix = advance();
           AST_PostfixOp *postfix_node = ALLOCATE(AST_PostfixOp, 1);
           postfix_node->node.type = ASTNODE_POSTFIX;
-          postfix_node->left = v;
+          postfix_node->left = (AST_Node*) v;
           postfix_node->operand = postfix;
 
           output = (AST_Node*) postfix;
         }
+
+        break;
       }
       default: {
-        syntax_error('Expected type.');
+        syntax_error("Expected type.");
         break;
       }
     }
@@ -132,7 +161,7 @@ static AST_Node* prefixUnary() {
     v->node.type = ASTNODE_PREFIX;
     v->operand = operand;
     v->right = right;
-    return v;
+    return (AST_Node*) v;
   }
 
   return primary();
@@ -147,7 +176,7 @@ static AST_Node* grouping() {
     AST_Grouping *v = ALLOCATE(AST_Grouping, 1);
     v->node.type = ASTNODE_GROUPING;
     v->expr = e;
-    return v;
+    return (AST_Node*) v;
   }
 
   return prefixUnary();
@@ -222,6 +251,7 @@ static AST_Node* or_expr() {
 static AST_Node* expr() {
   return or_expr();
 }
+
 static AST_Node* expression_statement() {
   AST_Node *n = expr();
   consume(T_SEMICOLON, "Expected semi-colon");
@@ -240,7 +270,13 @@ void ln_parser_start(TokenList *tokens) {
   parser.tokens = tokens;
   parser.current = 0;
 
-  expression_statement();
+  for (;;) {
+    expression_statement();
+    if (match(T_EOF)) {
+      advance();
+      break;
+    }
+  }
   
   ln_debug_ast(parser);
 }
