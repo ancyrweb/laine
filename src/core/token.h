@@ -4,7 +4,7 @@
 #define LAINE_TOKEN_H
 
 typedef enum TokenType {
-    T_BYTE, T_SHORT, T_INT, T_LONG, T_FLOAT, T_DOUBLE, T_BOOL,
+    T_BYTE, T_SHORT, T_INT, T_LONG, T_FLOAT, T_BOOL,
 
     T_DO, T_WHILE, T_FOR,
     T_IF, T_ELSE, T_ELSEIF,

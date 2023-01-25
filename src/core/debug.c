@@ -12,7 +12,6 @@ char* ln_debug_toktostr(TokenType type) {
     T(T_INT);
     T(T_LONG);
     T(T_FLOAT);
-    T(T_DOUBLE);
     T(T_PLUS);
     T(T_MINUS);
     T(T_STAR);
@@ -75,7 +74,6 @@ void ln_debug_tokens(TokenList *list) {
       T(T_INT);
       T(T_LONG);
       T(T_FLOAT);
-      T(T_DOUBLE);
       T(T_PLUS);
       T(T_MINUS);
       T(T_STAR);

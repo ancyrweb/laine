@@ -113,8 +113,31 @@ static void identifier_or_keyword() {
   memcpy(&buff, scanner.source + scanner.start, size);
   buff[size] = '\0';
 
-  if (memcmp(buff, "int", 3) == 0) {
+  // Here goes nothing
+  if (memcmp(buff, "byte", 4) == 0) {
+    add_token(T_BYTE);
+  } else if (memcmp(buff, "short", 5) == 0) {
+    add_token(T_SHORT);
+  } else if (memcmp(buff, "int", 3) == 0) {
     add_token(T_INT);
+  } else if (memcmp(buff, "long", 4) == 0) {
+    add_token(T_LONG);
+  } else if (memcmp(buff, "float", 5) == 0) {
+    add_token(T_FLOAT);
+  } else if (memcmp(buff, "bool", 4) == 0) {
+    add_token(T_BOOL);
+  } else if (memcmp(buff, "do", 2) == 0) {
+    add_token(T_DO);
+  } else if (memcmp(buff, "while", 5) == 0) {
+    add_token(T_WHILE);
+  } else if (memcmp(buff, "for", 3) == 0) {
+    add_token(T_FOR);
+  } else if (memcmp(buff, "if", 2) == 0) {
+    add_token(T_IF);
+  } else if (memcmp(buff, "else", 4) == 0) {
+    add_token(T_ELSE);
+  } else if (memcmp(buff, "elseif", 6) == 0) {
+    add_token(T_ELSEIF);
   } else {
     add_token(T_IDENTIFIER);
   }
