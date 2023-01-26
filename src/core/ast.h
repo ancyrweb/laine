@@ -3,14 +3,9 @@
 
 #include "token.h"
 
-typedef enum ASTStatementType {
-  AST_STMT_EXPR
-} ASTStatementType;
 
-typedef struct ASTStatementNode {
-  ASTStatementType type;
-} ASTStatementNode;
 
+// Expressions
 typedef enum ASTExprType {
   AST_EXPR_VALUE,
   AST_EXPR_BINOP,
@@ -65,6 +60,17 @@ typedef struct {
 } ASTExprPostfixOp;
 
 
-void ln_ast_free(ASTExprNode *node);
+typedef enum ASTStatementType {
+  AST_STMT_EXPR
+} ASTStatementType;
+
+typedef struct ASTStatementNode {
+  ASTStatementType type;
+  void *stmt;
+} ASTStatementNode;
+
+
+void ln_ast_free(ASTStatementNode *node);
+void ln_ast_free_expr(ASTExprNode *node);
 
 #endif

@@ -7,16 +7,10 @@
 #include "ast.h"
 
 typedef struct {
-  int size;
-  int capacity;
-  ASTExprNode **nodes;
-} ParserNodes;
-
-typedef struct {
   struct {
     int size;
     int capacity;
-    ASTExprNode **nodes;
+    ASTStatementNode **nodes;
   } nodes;
 
   TokenList *tokens;

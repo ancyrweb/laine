@@ -117,7 +117,7 @@ void ln_debug_tokens(TokenList *list) {
   #undef TT
 }
 
-static void debug_node(ASTExprNode *node, unsigned int depth) {
+ void ln_debug_expr_node(ASTExprNode *node, unsigned int depth) {
   #define PRINT_BUFF() \
     p += sprintf(p, "%c", '\0'); \
     printf("%s\n", printf_buffer); \
@@ -154,8 +154,8 @@ static void debug_node(ASTExprNode *node, unsigned int depth) {
       p += sprintf(p, "- Binop - Operand : %s", ln_debug_toktostr(value->operand->type));
       PRINT_BUFF();
 
-      debug_node(left, depth + 1);
-      debug_node(right, depth + 1);
+      ln_debug_expr_node(left, depth + 1);
+      ln_debug_expr_node(right, depth + 1);
       break;
     }
     case AST_EXPR_POSTFIX: {
@@ -164,7 +164,7 @@ static void debug_node(ASTExprNode *node, unsigned int depth) {
       p += sprintf(p, "- PostfixOp - Operand : %s", ln_debug_toktostr(value->operand->type));
       PRINT_BUFF();
 
-      debug_node(value->left, depth + 1);
+      ln_debug_expr_node(value->left, depth + 1);
       break;
     }
     case AST_EXPR_PREFIX: {
@@ -173,7 +173,7 @@ static void debug_node(ASTExprNode *node, unsigned int depth) {
       p += sprintf(p, "- PrefixOp - Operand : %s", ln_debug_toktostr(value->operand->type));
       PRINT_BUFF();
 
-      debug_node(value->right, depth + 1);
+      ln_debug_expr_node(value->right, depth + 1);
       break;
     }
     case AST_EXPR_GROUPING: {
@@ -182,7 +182,7 @@ static void debug_node(ASTExprNode *node, unsigned int depth) {
       p += sprintf(p, "- Grouping");
       PRINT_BUFF();
    
-      debug_node(value->expr, depth + 1);
+      ln_debug_expr_node(value->expr, depth + 1);
       break;
     }
   }
@@ -190,10 +190,20 @@ static void debug_node(ASTExprNode *node, unsigned int depth) {
   #undef PRINT_BUFF
 }
 
+ void ln_debug_stmt_node(ASTStatementNode *node, int depth) {
+  switch(node->type) {
+    case AST_STMT_EXPR: {
+      printf("- STATEMENT EXPRESSION\n");
+      ASTExprNode *expr = (ASTExprNode*) node->stmt;
+      ln_debug_expr_node(expr, 0);
+    }
+  }
+}
+
 void ln_debug_ast(Parser parser) {
   printf("--- AST ---\n");
   for (int i = 0; i < parser.nodes.size; i++) {
-    ASTExprNode *node = parser.nodes.nodes[i];
-    debug_node(node, 0);
+    ASTStatementNode *node = parser.nodes.nodes[i];
+    ln_debug_stmt_node(node, 0);
   }
 }

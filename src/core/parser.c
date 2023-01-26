@@ -16,11 +16,11 @@ Parser parser;
 static ASTExprNode* expr();
 
 // allocation
-static void add_node(ASTExprNode *node) {
+static void add_node(ASTStatementNode *node) {
   if (parser.nodes.size == parser.nodes.capacity) {
     if (parser.nodes.size == 0) {
       parser.nodes.capacity = 8;
-      parser.nodes.nodes = ALLOCATE(ASTExprNode, parser.nodes.capacity);
+      parser.nodes.nodes = ALLOCATE(ASTStatementNode, parser.nodes.capacity);
     } else {
       int next_capacity = parser.nodes.capacity * 2;
       parser.nodes.nodes = ln_reallocate(parser.nodes.nodes, parser.nodes.capacity, next_capacity);
@@ -252,14 +252,16 @@ static ASTExprNode* expr() {
   return or_expr();
 }
 
-static ASTExprNode* expression_statement() {
+static ASTStatementNode* expression_statement() {
   ASTExprNode *n = expr();
   consume(T_SEMICOLON, "Expected semi-colon");
 
-  if (n != NULL) {
-    add_node(n);
-  }
-  return n;
+  ASTStatementNode *stmt = ALLOCATE(ASTStatementNode, 1);
+  stmt->type = AST_STMT_EXPR;
+  stmt->stmt = n;
+  add_node(stmt);
+  
+  return stmt;
 }
 
 // interface
