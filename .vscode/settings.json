@@ -22,7 +22,8 @@
     "type_traits": "c",
     "vector": "c",
     "ios": "c",
-    "__node_handle": "c"
+    "__node_handle": "c",
+    "atomic": "c"
   },
   "C_Cpp.errorSquiggles": "disabled"
 }

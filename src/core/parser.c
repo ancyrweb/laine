@@ -10,6 +10,11 @@
 #include <stdbool.h>
 #include <string.h>
 
+#define THROW_IF_NULL(value) \
+  if (value == NULL) { \
+    return NULL; \
+  }
+  
 Parser parser;
 
 // headers
@@ -40,23 +45,63 @@ static bool match(TokenType t) {
   return parser.tokens->tokens[parser.current]->type == t;
 }
 
-static void syntax_error(const char *error_msg) {
-  fprintf(stderr, "Error : %s", error_msg);
-  exit(1);
+static TokenType current_type() {
+  return parser.tokens->tokens[parser.current]->type;
 }
 
-static void consume(TokenType t, const char *error_msg) {
+static void syntax_error(const char *error_msg) {
+  Token *curr = parser.tokens->tokens[parser.current];
+
+  fprintf(stderr, "Syntax error : %s\n", error_msg);
+  fprintf(stderr, "At line %d, (%d)\n", curr->line, curr->start);
+
+  parser.is_panic = true;
+}
+
+static bool consume(TokenType t, const char *error_msg) {
   if (!match(t)) {
     syntax_error(error_msg);
-    return;
+    return false;
   }
 
   parser.current++;
+  return true;
 }
 
 static Token* advance() {
   return parser.tokens->tokens[parser.current++];
 }
+
+static Token* expect(TokenType type) {
+  if (!match(type)) {
+    char buff[256];
+    sprintf(
+      buff, 
+      "Expected %s but got %s", 
+      ln_debug_toktostr(type), 
+      ln_debug_toktostr(current_type())
+    );
+
+    syntax_error(buff);
+    return NULL;
+  }
+
+  return advance();
+}
+
+static void synchronize_statement() {
+  while(!is_eof() && !match(T_EOF) && !match(T_SEMICOLON)) {
+    advance();
+  }
+
+  if (match(T_SEMICOLON)) {
+    advance();
+  }
+
+  parser.is_panic = false;
+}
+
+// recursive descent parser
 
 static ASTExprBinop* alloc_binop(ASTExprNode *left, ASTExprNode *right, Token *operand) {
     ASTExprBinop *binop = ALLOCATE(ASTExprBinop, 1);
@@ -140,7 +185,9 @@ static ASTExprNode* primary() {
         break;
       }
       default: {
+        free(v);
         syntax_error("Expected type.");
+        return NULL;
         break;
       }
     }
@@ -148,6 +195,7 @@ static ASTExprNode* primary() {
     return output;
   } else {
     syntax_error("Expected primary.");
+    return NULL;
   }
 }
 
@@ -156,6 +204,7 @@ static ASTExprNode* prefixUnary() {
     Token *operand = advance();
     ASTExprNode *right = primary();
     
+    THROW_IF_NULL(right)
 
     ASTExprPrefixOp *v = ALLOCATE(ASTExprPrefixOp, 1);
     v->node.type = AST_EXPR_PREFIX;
@@ -171,7 +220,13 @@ static ASTExprNode* grouping() {
   if (match(T_PAREN_LEFT)) {
     advance();
     ASTExprNode *e = expr();
-    consume(T_PAREN_RIGHT, "Expected right parenthesis.");
+
+    THROW_IF_NULL(e)
+
+    if (!consume(T_PAREN_RIGHT, "Expected right parenthesis.")) {
+      ln_ast_free_expr(e);
+      return NULL;
+    }
 
     ASTExprGroup *v = ALLOCATE(ASTExprGroup, 1);
     v->node.type = AST_EXPR_GROUPING;
@@ -182,11 +237,21 @@ static ASTExprNode* grouping() {
   return prefixUnary();
 }
 
+
+
 static ASTExprNode* factor_expr() {
   ASTExprNode *left = grouping();
+  THROW_IF_NULL(left)
+
   while (match(T_STAR) || match(T_SLASH) || match(T_MODULO)) {
     Token *operand = advance();
     ASTExprNode *right = grouping();
+
+    if (right == NULL) {
+      ln_ast_free_expr(left);
+      return NULL;
+    }
+
     left = (ASTExprNode*) alloc_binop(left, right, operand);
   }
 
@@ -198,6 +263,12 @@ static ASTExprNode* terms_expr() {
   while (match(T_PLUS) || match(T_MINUS)) {
     Token *operand = advance();
     ASTExprNode *right = factor_expr();
+
+    if (right == NULL) {
+      ln_ast_free_expr(left);
+      return NULL;
+    }
+
     left = (ASTExprNode*) alloc_binop(left, right, operand);
   }
 
@@ -209,6 +280,12 @@ static ASTExprNode* comparison_expr() {
   while (match(T_LOWER) || match(T_LOWER_EQUAL) || match(T_GREATER) || match(T_GREATER_EQUAL)) {
     Token *operand = advance();
     ASTExprNode *right = terms_expr();
+
+    if (right == NULL) {
+      ln_ast_free_expr(left);
+      return NULL;
+    }
+
     left = (ASTExprNode*) alloc_binop(left, right, operand);
   }
 
@@ -220,6 +297,12 @@ static ASTExprNode* equality_expr() {
   while (match(T_EQUAL_EQUAL) || match(T_BANG_EQUAL)) {
     Token *operand = advance();
     ASTExprNode *right = comparison_expr();
+
+    if (right == NULL) {
+      ln_ast_free_expr(left);
+      return NULL;
+    }
+
     left = (ASTExprNode*) alloc_binop(left, right, operand);
   }
 
@@ -231,6 +314,12 @@ static ASTExprNode* and_expr() {
   while (match(T_AND)) {
     Token *operand = advance();
     ASTExprNode *right = equality_expr();
+
+    if (right == NULL) {
+      ln_ast_free_expr(left);
+      return NULL;
+    }
+
     left = (ASTExprNode*) alloc_binop(left, right, operand);
   }
 
@@ -242,6 +331,12 @@ static ASTExprNode* or_expr() {
   while (match(T_OR)) {
     Token *operand = advance();
     ASTExprNode *right = and_expr();
+
+    if (right == NULL) {
+      ln_ast_free_expr(left);
+      return NULL;
+    }
+
     left = (ASTExprNode*) alloc_binop(left, right, operand);
   }
 
@@ -254,10 +349,48 @@ static ASTExprNode* expr() {
 
 static ASTStatementNode* expression_statement() {
   ASTExprNode *n = expr();
-  consume(T_SEMICOLON, "Expected semi-colon");
+
+  if (parser.is_panic) {
+    synchronize_statement();
+    return NULL;
+  }
+
+  if(!consume(T_SEMICOLON, "Expected semi-colon")) {
+    synchronize_statement();
+    return NULL;
+  }
 
   ASTStatementNode *stmt = ALLOCATE(ASTStatementNode, 1);
   stmt->type = AST_STMT_EXPR;
+  stmt->stmt = n;
+  add_node(stmt);
+  
+  return stmt;
+}
+
+static ASTStatementNode *variable_definition() {
+  Token *type = advance();
+  Token *identifier = expect(T_IDENTIFIER);
+
+  if (parser.is_panic) {
+    synchronize_statement();
+    return NULL;
+  }
+
+  ASTVariableDefinitionNode *n = ALLOCATE(ASTVariableDefinitionNode, 1);
+  n->type = type;
+  n->identifier = identifier;
+
+  if (match(T_EQUAL)) {
+    advance();
+    ASTExprNode *expr_node = expr();
+    n->expr = expr_node;
+  }
+
+  consume(T_SEMICOLON, "Expected semicolon.");
+
+  ASTStatementNode *stmt = ALLOCATE(ASTStatementNode, 1);
+  stmt->type = AST_VARIABLE_DEFINITION;
   stmt->stmt = n;
   add_node(stmt);
   
@@ -271,9 +404,16 @@ void ln_parser_start(TokenList *tokens) {
   parser.nodes.nodes = NULL;
   parser.tokens = tokens;
   parser.current = 0;
+  parser.is_panic = false;
 
   for (;;) {
-    expression_statement();
+    ASTStatementNode *node;
+    if (match(T_INT) || match(T_FLOAT) || match(T_BOOL)) {
+      node = variable_definition();
+    } else {
+      node = expression_statement();
+    }
+
     if (match(T_EOF)) {
       advance();
       break;

@@ -61,7 +61,8 @@ typedef struct {
 
 
 typedef enum ASTStatementType {
-  AST_STMT_EXPR
+  AST_STMT_EXPR,
+  AST_VARIABLE_DEFINITION
 } ASTStatementType;
 
 typedef struct ASTStatementNode {
@@ -69,6 +70,11 @@ typedef struct ASTStatementNode {
   void *stmt;
 } ASTStatementNode;
 
+typedef struct ASTVariableDefinitionNode {
+  Token *type;
+  Token *identifier;
+  ASTExprNode *expr;
+} ASTVariableDefinitionNode;
 
 void ln_ast_free(ASTStatementNode *node);
 void ln_ast_free_expr(ASTExprNode *node);
