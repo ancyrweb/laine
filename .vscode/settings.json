@@ -23,7 +23,9 @@
     "vector": "c",
     "ios": "c",
     "__node_handle": "c",
-    "atomic": "c"
+    "atomic": "c",
+    "stdio.h": "c",
+    "stdbool.h": "c"
   },
   "C_Cpp.errorSquiggles": "disabled"
 }

@@ -4,6 +4,7 @@
 #include "ast.h"
 #include "memory.h"
 #include "debug.h"
+#include "../compiler.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -43,6 +44,14 @@ static bool is_eof() {
 
 static bool match(TokenType t) {
   return parser.tokens->tokens[parser.current]->type == t;
+}
+
+static bool match_next(TokenType t) {
+  if (is_eof()) {
+    return false;
+  }
+
+  return parser.tokens->tokens[parser.current + 1]->type == t;
 }
 
 static TokenType current_type() {
@@ -179,7 +188,7 @@ static ASTExprNode* primary() {
           postfix_node->left = (ASTExprNode*) v;
           postfix_node->operand = postfix;
 
-          output = (ASTExprNode*) postfix;
+          output = (ASTExprNode*) postfix_node;
         }
 
         break;
@@ -387,10 +396,41 @@ static ASTStatementNode *variable_definition() {
     n->expr = expr_node;
   }
 
-  consume(T_SEMICOLON, "Expected semicolon.");
+  if (!consume(T_SEMICOLON, "Expected semicolon.")) {
+    synchronize_statement();
+    return NULL;
+  }
 
   ASTStatementNode *stmt = ALLOCATE(ASTStatementNode, 1);
   stmt->type = AST_VARIABLE_DEFINITION;
+  stmt->stmt = n;
+  add_node(stmt);
+  
+  return stmt;
+}
+
+static ASTStatementNode *variable_assignment() {
+  Token *identifier = advance();
+  Token *operator = advance();
+  ASTExprNode *e = expr();
+
+  if (parser.is_panic) {
+    synchronize_statement();
+    return NULL;
+  }
+
+  if (!consume(T_SEMICOLON, "Expected semicolon.")) {
+    synchronize_statement();
+    return NULL;
+  }
+
+  ASTVariableAssignmentNode *n = ALLOCATE(ASTVariableAssignmentNode, 1);
+  n->identifier = identifier;
+  n->assignment_operator = operator;
+  n->expr = e;
+
+  ASTStatementNode *stmt = ALLOCATE(ASTStatementNode, 1);
+  stmt->type = AST_VARIABLE_ASSIGNMENT;
   stmt->stmt = n;
   add_node(stmt);
   
@@ -410,6 +450,14 @@ void ln_parser_start(TokenList *tokens) {
     ASTStatementNode *node;
     if (match(T_INT) || match(T_FLOAT) || match(T_BOOL)) {
       node = variable_definition();
+    } else if (match(T_IDENTIFIER)) {
+      if (
+        match_next(T_EQUAL) || match_next(T_PLUS_EQUAL) || match(T_MINUS_EQUAL) || 
+        match(T_STAR_EQUAL) || match_next(T_SLASH_EQUAL) || match(T_MODULO_EQUAL)) {
+        node = variable_assignment();
+      } else {
+        node = expression_statement();
+      }
     } else {
       node = expression_statement();
     }
@@ -420,7 +468,9 @@ void ln_parser_start(TokenList *tokens) {
     }
   }
   
-  ln_debug_ast(parser);
+  if (compiler_options.debug_ast) {
+    ln_debug_ast(parser);
+  }
 }
 
 void ln_parser_free() {

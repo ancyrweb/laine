@@ -185,17 +185,57 @@ void ln_debug_tokens(TokenList *list) {
       ln_debug_expr_node(value->expr, depth + 1);
       break;
     }
+    default: {
+      printf("Unrecognized expression %d\n", node->type);
+      break;
+    }
   }
 
   #undef PRINT_BUFF
 }
 
- void ln_debug_stmt_node(ASTStatementNode *node, int depth) {
+static void extract_identifier(TokenList *list, Token *v, char *buff) {
+  memcpy(buff, list->source + v->start, v->length); 
+  buff[v->length] = '\0'; 
+}
+
+void ln_debug_stmt_node(TokenList *list, ASTStatementNode *node, int depth) {
   switch(node->type) {
     case AST_STMT_EXPR: {
-      printf("- STATEMENT EXPRESSION\n");
+      printf("# Statement Expression\n");
       ASTExprNode *expr = (ASTExprNode*) node->stmt;
       ln_debug_expr_node(expr, 0);
+      break;
+    }
+    case AST_VARIABLE_DEFINITION: {
+      ASTVariableDefinitionNode *v = (ASTVariableDefinitionNode*) node->stmt;
+      printf("# Variable Definition\n");
+      printf("- Type : %s\n", ln_debug_toktostr(v->type->type));
+
+      char buff[512];
+      extract_identifier(list, v->identifier, buff);
+
+      printf("- Id : %s\n", buff);
+      if (v->expr != NULL) {
+        ln_debug_expr_node(v->expr, 1);
+      }
+
+      break;
+    }
+    case AST_VARIABLE_ASSIGNMENT: {
+      ASTVariableAssignmentNode *v = (ASTVariableAssignmentNode*) node->stmt;
+      printf("# Variable Assignment\n");
+      printf("- Operand : %s\n", ln_debug_toktostr(v->assignment_operator->type));
+
+      char buff[512];
+      extract_identifier(list, v->identifier, buff);
+
+      printf("- Id : %s\n", buff);
+      if (v->expr != NULL) {
+        ln_debug_expr_node(v->expr, 1);
+      }
+
+      break;
     }
   }
 }
@@ -204,6 +244,6 @@ void ln_debug_ast(Parser parser) {
   printf("--- AST ---\n");
   for (int i = 0; i < parser.nodes.size; i++) {
     ASTStatementNode *node = parser.nodes.nodes[i];
-    ln_debug_stmt_node(node, 0);
+    ln_debug_stmt_node(parser.tokens, node, 0);
   }
 }

@@ -4,9 +4,9 @@
 
 #include <stdio.h>
 
-Compiler compiler;
+void ln_compile(const char *source, CompilerOptions options) {
+  compiler_options = options;
 
-void ln_compile(const char *source) {
   ln_scan_init(source);
   ln_scan_start();
 

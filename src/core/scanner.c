@@ -1,6 +1,7 @@
 #include "scanner.h"
 #include "memory.h"
 #include "debug.h"
+#include "../compiler.h"
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -279,7 +280,9 @@ void ln_scan_start() {
     }
   }
 
-  ln_debug_tokens(scanner.tokens);
+  if (compiler_options.debug_tokens) {
+    ln_debug_tokens(scanner.tokens);
+  }
   #undef MATCH
 }
 

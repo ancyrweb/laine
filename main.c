@@ -3,6 +3,11 @@
 #include "src/compiler.h"
 
 int main() {
-  ln_compile("int = 123; 123 + 3 / 4 * 10 - 3 int 456; 1;");
+  CompilerOptions options = { 
+    .debug_ast = false, 
+    .debug_tokens = false 
+  };
+
+  ln_compile("int j = 123; ++j; j = j + 1;", options);
   return 0;
 }
