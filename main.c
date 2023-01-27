@@ -5,9 +5,9 @@
 int main() {
   CompilerOptions options = { 
     .debug_ast = false, 
-    .debug_tokens = false 
+    .debug_tokens = false
   };
 
-  ln_compile("int j = 123; ++j; j = j + 1;", options);
+  ln_compile("int j = 123; ++j; j = j + 1; x = true;", options);
   return 0;
 }

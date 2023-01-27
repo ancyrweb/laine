@@ -139,6 +139,10 @@ static void identifier_or_keyword() {
     add_token(T_ELSE);
   } else if (memcmp(buff, "elseif", 6) == 0) {
     add_token(T_ELSEIF);
+  } else if (memcmp(buff, "true", 4) == 0) {
+    add_token(T_TRUE);
+  } else if (memcmp(buff, "false", 5) == 0) {
+    add_token(T_FALSE);
   } else {
     add_token(T_IDENTIFIER);
   }

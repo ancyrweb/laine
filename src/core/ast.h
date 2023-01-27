@@ -2,8 +2,7 @@
 #define LAINE_AST_H
 
 #include "token.h"
-
-
+#include <stdbool.h>
 
 // Expressions
 typedef enum ASTExprType {
@@ -18,6 +17,7 @@ typedef enum ASTExprValueType {
   AST_EXPRVAL_INT,
   AST_EXPRVAL_FLOAT,
   AST_EXPRVAL_STRING,
+  AST_EXPRVAL_BOOL,
   AST_EXPRVAL_IDENTIFIER,
 } ASTExprValueType;
 
@@ -31,6 +31,7 @@ typedef struct {
   union {
     int int_val; 
     double float_val;
+    bool bool_val;
     char *string_val;
   } as;
 } ASTExprValue;

@@ -145,7 +145,9 @@ static char* extract_lexeme(Token* t) {
 
 // parsing
 static ASTExprNode* primary() {
-  if (match(T_INTEGER_LITERAL) || match(T_IDENTIFIER) || match(T_FLOATING_LITERAL) || match(T_STRING_LITERAL)) {
+  if (
+    match(T_INTEGER_LITERAL) || match(T_IDENTIFIER) || match(T_FLOATING_LITERAL) || 
+    match(T_STRING_LITERAL) || match(T_TRUE) || match(T_FALSE)) {
     Token* t = advance();
 
     ASTExprValue *v = ALLOCATE(ASTExprValue, 1);
@@ -175,6 +177,12 @@ static ASTExprNode* primary() {
       case T_STRING_LITERAL: {
         v->as.string_val = extract_string_literal(t);
         v->type = AST_EXPRVAL_STRING;
+        break;
+      }
+      case T_TRUE:
+      case T_FALSE: {
+        v->as.bool_val = t->type == T_TRUE ? true : T_FALSE;
+        v->type = AST_EXPRVAL_BOOL;
         break;
       }
       case T_IDENTIFIER: {

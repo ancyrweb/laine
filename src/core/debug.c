@@ -44,6 +44,8 @@ char* ln_debug_toktostr(TokenType type) {
     T(T_IDENTIFIER)
     T(T_STRING_LITERAL)
     T(T_FLOATING_LITERAL)
+    T(T_TRUE)
+    T(T_FALSE)
     T(T_EOF);
     default: {
       return "T_UNKNOWN";
@@ -106,6 +108,8 @@ void ln_debug_tokens(TokenList *list) {
       TT(T_IDENTIFIER)
       TT(T_STRING_LITERAL)
       TT(T_FLOATING_LITERAL)
+      T(T_TRUE);
+      T(T_FALSE);
       T(T_EOF);
       default: {
         printf("T_UNKNOWN\n");
@@ -139,6 +143,8 @@ void ln_debug_tokens(TokenList *list) {
         p += sprintf(p, "- Float : %lf", value->as.float_val);
       } else if (value->type == AST_EXPRVAL_STRING) {
         p += sprintf(p, "- String : %s", value->as.string_val);
+      } else if (value->type == AST_EXPRVAL_BOOL) {
+        p += sprintf(p, "- Boolean : %s", value->as.bool_val == true ? "true" : "false");
       } else if (value->type == AST_EXPRVAL_IDENTIFIER) {
         p += sprintf(p, "- Identifier : %s", value->as.string_val);
       }
